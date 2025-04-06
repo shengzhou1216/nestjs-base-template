@@ -36,6 +36,9 @@ async function bootstrap() {
   // helmet
   app.use(helmet());
 
+  // global prefix
+  app.setGlobalPrefix('api/v1');
+
   await app.listen(systemConfig.port);
   return systemConfig;
 }

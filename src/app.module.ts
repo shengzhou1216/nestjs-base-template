@@ -26,11 +26,8 @@ import { AllExceptionsFilter } from '@app/core/filters/all-exceptions.filter';
 import { HttpExceptionFilter } from '@app/core/filters/http-exception.filter';
 import { LoggingInterceptor } from '@app/core/interceptors/logging.interceptor';
 import { ResponseInterceptor } from '@app/core/interceptors/response.interceptor';
-import { PermissionGuard } from '@app/permissions/gurads/permission.guard';
-import { PermissionsModule } from '@app/permissions/permissions.module';
-import { PolicyModule } from '@app/policy/policy.module';
-import { RolesModule } from '@app/roles/roles.module';
 import { UsersModule } from '@app/users/users.module';
+import * as mysql from 'mysql2/promise';
 
 @Module({
   imports: [
@@ -82,8 +79,18 @@ import { UsersModule } from '@app/users/users.module';
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
+      useFactory: async (configService: ConfigService) => {
         const config = configService.get<DbConfig>('db').mysql;
+        // create database if not exists
+        const connection = await mysql.createConnection({
+          host: config.host,
+          port: config.port,
+          user: config.username,
+          password: config.password,
+        });
+        await connection.query(`CREATE DATABASE IF NOT EXISTS \`${config.database}\`;`);
+        await connection.end();
+
         return {
           type: 'mysql',
           host: config.host,
@@ -100,13 +107,10 @@ import { UsersModule } from '@app/users/users.module';
       },
     }),
     CoreModule,
-    RolesModule,
     CommonModule,
     AuthModule,
     UsersModule,
     ConfigModule,
-    PermissionsModule,
-    PolicyModule,
     CacheModule,
   ],
   controllers: [AppController],
@@ -144,10 +148,6 @@ import { UsersModule } from '@app/users/users.module';
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
-    },
-    {
-      provide: APP_GUARD,
-      useClass: PermissionGuard,
     },
     AppService,
   ],

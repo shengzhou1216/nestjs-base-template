@@ -1,6 +1,6 @@
 ## Description
 
-[Nest](https://github.com/nestjs/nest) admin base template.
+[Nest](https://github.com/nestjs/nest) base template.
 
 ## Installation
 
@@ -23,8 +23,6 @@ $ pnpm run start:prod
 
 ## Features
 - [Jwt](https://github.com/nestjs/jwt)
-- [Casbin](https://casbin.org/)
 - [winston](https://github.com/gremo/nest-winston)
 - [swagger](https://www.npmjs.com/package/@nestjs/swagger)
 - [TypeORM](https://www.npmjs.com/package/@nestjs/typeorm)
-- Permission annotation
